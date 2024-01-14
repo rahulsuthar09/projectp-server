@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/rahulsuthar09/projectp-server#readme",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   }
 }
