@@ -28,7 +28,7 @@ const limiter = rateLimiter({
 
 /* 
     For Redis Store Rate Limiter
-    const redisStor = require('rate-limit-redis')
+    const redisStore = require('rate-limit-redis')
     const redisClient = require('../../lib/redis')
 
     await redisClient.connect()

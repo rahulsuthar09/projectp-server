@@ -1,30 +1,26 @@
-const express = require('express')
-const app = express()
+global.rootRequire = name => require(`${__dirname}/${name}`);
+var express = require('express')
 const config = require('./config/config.js')
-const { swaggerServe, swaggerSetup } = require('./app/swagger-doc/index.js')
 const client = require('./lib/redis.js')
+var dbR = rootRequire('app/models')
 
-//swagger api documentation
-app.use('/api-docs', swaggerServe, swaggerSetup);
+var app = express();
+rootRequire('express')(app, config);
 
-//rate limiter
-const rateLimiterMiddleware = require('./app/middlewares/rateLimiter.js')
 
-/*
-    global rate limiting
-    app.use(rateLimiterMiddleware)
-
-    API throttling (api level  rate limiting)
-    app.get('/', rateLimiterMiddleware, async (req, res) => {res.send({'msg': 'health fine'})})
-
-*/
-
-app.get('/', async (req, res) => {
+app.get('/health-check', async (req, res) => {
     try {
-        console.log('health')
-        await client.set('developer', 'rahul');
-        let name = await client.get('name');
-        res.status(200).send({ message: 'Health: Fine', name: name, method: req.method })
+        let healthCheck = {}
+
+        //Redis Health
+        try {
+            await client.connect()
+            healthCheck['Redis'] = { status: 'Up', error: null }
+        } catch (e) {
+            console.log(e)
+            healthCheck['Redis'] = { status: 'Down', error: e.msg }
+        }
+        res.status(200).send(healthCheck)
     } catch (error) {
         console.log(error)
         res.send({ message: 'ERROR' })
@@ -35,8 +31,15 @@ app.get('/', async (req, res) => {
 //entry point 
 async function appStart() {
     try {
-        await client.connect()
+        //Redis Database Connection
+        await client.connect();
+
+        // MySQL database connection
+        // let prms = [dbR.sequelize.authenticate()];
+        // await Promise.all(prms)
+
         app.listen(config.port, function () {
+            console.log('Database Connected Successfully')
             console.log(`Server running at http://localhost:${config.port}`);
         })
     } catch (error) {
