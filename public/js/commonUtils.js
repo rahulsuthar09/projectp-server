@@ -27,6 +27,17 @@ var Utils = function() {
         formatDateIn: function (date, format = 'YYYY-MM-DD') {
             return moment(date).format(format);
         },
+        mapArr: function (arr, key) {
+            var obj = {};
+            if (arr && arr.length != undefined) {
+                for (var j = 0; j < arr.length; j++) {
+                    if (arr[j][key] !== null) {
+                        obj[arr[j][key]] = arr[j];
+                    }
+                }
+            }
+            return obj;
+        },
         
     }
 }
